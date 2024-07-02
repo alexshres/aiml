@@ -19,9 +19,6 @@ class Perceptron:
 
 
     def fit(self):
-        print(f"Shape of self. X is {self.X.shape}")
-        print(f"Shape of self.weights is {self.weights.shape}")
-
         predicted = self.X @ self.weights
 
         update_weights = np.zeros((self.X.shape[1], 1))
@@ -29,14 +26,11 @@ class Perceptron:
         # For each set of data (for each row)
         for i in range(self.X.shape[0]):
             # Checking if signs match
-            signed_arr = []
-            signed_arr.append(predicted[i])
-            signed_arr.append(self.y[i])
+            predict_sign = np.sign(predicted[i])
+            actual_sign = np.sign(self.y[i])
 
-            # sign_arr = np.sign([predicted[i], self.y[i]])
-            
             # If our prediction is incorrect
-            if signed_arr[0] != signed_arr[1]:
+            if predict_sign != actual_sign:
                 # For each weight coefficient we calculate update value
                 # using stochastic gradient descent
                 for j in range(update_weights.shape[0]): 
@@ -46,7 +40,7 @@ class Perceptron:
                 update_weights = 0 * update_weights
 
             # Updating weights with whatever the learning_rate is
-            self.weights = self.weights - self.learning_rate * update_weights
+            self.weights = self.weights - (self.learning_rate * update_weights)
 
         return self.weights
 
