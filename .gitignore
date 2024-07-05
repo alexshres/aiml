@@ -1,0 +1,7 @@
+./perceptrons/mnist_csv
+./perceptrons/mnist_csv/*
+./perceptrons/mnist_csv/mnist_train.csv
+./perceptrons/mnist_csv/mnist_test.csv
+*.csv
+
+
