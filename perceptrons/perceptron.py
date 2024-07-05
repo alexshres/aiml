@@ -17,7 +17,7 @@ class Perceptron:
         # Size of weights is the number of rows in our input array
         self.weights = np.zeros((self.X.shape[1], 1))
 
-        self.iters = 100
+        self.epochs = 100
 
 
     def fit(self):
@@ -25,7 +25,7 @@ class Perceptron:
 
         update_weights = np.zeros((self.X.shape[1], 1))
         
-        for i in range(self.iters):
+        for i in range(self.epochs):
             indices = np.arange(self.X.shape[0])
             np.random.shuffle(indices)
             self.X = self.X[indices]
