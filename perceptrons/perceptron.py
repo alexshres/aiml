@@ -5,7 +5,8 @@ class Perceptron:
     def __init__(self, X: np.ndarray, y: np.array, learning_rate=0.01, epochs=100,
                  outputs=1):
         self.X = X
-        self.y = y
+        self.y = np.zeros((y.size, y.max() + 1)) 
+        self.y[np.arange(y.size), y] = 1
 
         # Adding bias column to each training data
         ones_column = np.ones((X.shape[0], 1))
@@ -21,6 +22,9 @@ class Perceptron:
         self.epochs = epochs
         self.outputs = outputs
 
+        print("Printing self.y")
+        print(self.y)
+
 
     def fit(self):
         predicted = self.X @ self.weights
@@ -33,7 +37,7 @@ class Perceptron:
             self.X = self.X[indices]
             self.y = self.y[indices]
 
-            # For each set of data (for each row)
+            # for each row
             for i in range(self.X.shape[0]):
                 # Checking if signs match
                 predict_sign = np.sign(predicted[i])

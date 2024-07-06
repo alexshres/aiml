@@ -1,20 +1,23 @@
 import perceptron as pct
 import mnist_data as md
+import numpy as np
 
 def main():
 
-    """
     A = np.array([[2, 3], [1, 1],
                   [2, 1], [1, 2]])
-    b = np.array([1, -1, 1, -1])
+    b = np.array([0, 1, 2, 3])
 
-    perceptron = Perceptron(A, b)
+    perceptron = pct.Perceptron(A, b)
+
+    """
     weights = perceptron.fit()
 
     print(weights)
     """
 
 
+    """
     train_images_path = './mnist_gz/train-images-idx3-ubyte.gz'
     train_labels_path = './mnist_gz/train-labels-idx1-ubyte.gz'
 
@@ -35,6 +38,7 @@ def main():
     weights = perceptron.fit()
 
     print(weights)
+    """
 
     return
 

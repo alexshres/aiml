@@ -4,5 +4,5 @@
 ./perceptrons/mnist_csv/mnist_test.csv
 *csv
 *gz
-
+./perceptrons/__pycache*
 
