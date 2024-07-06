@@ -2,7 +2,8 @@ import numpy as np
 
 
 class Perceptron:
-    def __init__(self, X: np.ndarray, y: np.array):
+    def __init__(self, X: np.ndarray, y: np.array, learning_rate=0.01, epochs=100,
+                 outputs=1):
         self.X = X
         self.y = y
 
@@ -11,13 +12,14 @@ class Perceptron:
 
         self.X = np.hstack((ones_column, self.X))
 
-        self.learning_rate = 0.1
+        self.learning_rate = learning_rate
 
         # Initializing our weights to be all zeroes
         # Size of weights is the number of rows in our input array
         self.weights = np.zeros((self.X.shape[1], 1))
 
-        self.epochs = 100
+        self.epochs = epochs
+        self.outputs = outputs
 
 
     def fit(self):
@@ -52,34 +54,15 @@ class Perceptron:
 
         return self.weights
 
+    def ols(self) -> np.ndarray:  # returns best fit line
+        x = np.zeros(self.X.shape[0])
+        A_t = np.linalg.matrix_transpose(self.X)
+        inv_sym = np.linalg.inv(A_t @ self.X)         # matmul
+        half_proj = inv_sym @ A_t
+        x = half_proj @ b
 
-
-
-def ols(A: np.ndarray, b: np.array) -> np.ndarray:  # returns best fit line
-    x = np.zeros(A.shape[0])
-    A_t = np.linalg.matrix_transpose(A)
-    inv_sym = np.linalg.inv(A_t @ A)         # matmul
-    half_proj = inv_sym @ A_t
-    x = half_proj @ b
-
-    return x
+        return x
 
 
 
 
-def main():
-
-    A = np.array([[2, 3], [1, 1],
-                  [2, 1], [1, 2]])
-    b = np.array([1, -1, 1, -1])
-
-    perceptron = Perceptron(A, b)
-    weights = perceptron.fit()
-
-    print(weights)
-
-    return
-
-
-if __name__ == "__main__":
-    main()
