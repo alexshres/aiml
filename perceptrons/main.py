@@ -28,7 +28,11 @@ def main():
     image_data = md.load_images(train_images_path)
     label_data = md.load_labels(train_labels_path)
 
+    test_images_path = './mnist_gz/t10k-images-idx3-ubyte.gz'
+    test_labels_path = './mnist_gz/t10k-labels-idx1-ubyte.gz'
 
+    test_data = md.load_images(test_images_path)
+    test_labels = md.load_labels(test_labels_path)
     
     print("Printing numpy image data")
     print(image_data)
@@ -38,10 +42,13 @@ def main():
     print(label_data)
     print(f"Size of label data is {label_data.shape}")
 
-    perceptron = pct.Perceptron(image_data, label_data)
-    weights = perceptron.train()
+    inputs = 785
+    outputs = 10
 
-    print(weights)
+    perceptron = pct.Perceptron(inputs=inputs, outputs=outputs)
+    weights = perceptron.train(image_data, label_data)
+
+    perceptron.predict(test_data, test_labels)
 
     return
 
