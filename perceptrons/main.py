@@ -4,17 +4,21 @@ import numpy as np
 
 def main():
 
+    """
     A = np.array([[2, 3], [1, 1],
                   [2, 1], [1, 2]])
     b = np.array([0, 1, 2, 3])
 
-    perceptron = pct.Perceptron(A, b)
+    print(A)
+    print(b)
 
-    """
-    weights = perceptron.fit()
+    print(f"Shape of A is {A.shape}")
+    print(f"Shape of b is {b.shape}")
+    perceptron = pct.Perceptron(A, b, outputs=1)
+
+    weights = perceptron.train()
 
     print(weights)
-    """
 
 
     """
@@ -35,10 +39,9 @@ def main():
     print(f"Size of label data is {label_data.shape}")
 
     perceptron = pct.Perceptron(image_data, label_data)
-    weights = perceptron.fit()
+    weights = perceptron.train()
 
     print(weights)
-    """
 
     return
 
