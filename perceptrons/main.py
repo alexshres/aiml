@@ -34,21 +34,15 @@ def main():
     test_data = md.load_images(test_images_path)
     test_labels = md.load_labels(test_labels_path)
     
-    print("Printing numpy image data")
-    print(image_data)
-    print(f"Size of image data is {image_data.shape}")
-
-    print("Printing label data")
-    print(label_data)
-    print(f"Size of label data is {label_data.shape}")
-
     inputs = 785
     outputs = 10
 
-    perceptron = pct.Perceptron(inputs=inputs, outputs=outputs, epochs=100)
-    weights = perceptron.train(image_data, label_data)
+    for lr in [0.001, 0.01, 0.1]:
+        perceptron = pct.Perceptron(inputs=inputs, outputs=outputs, 
+                                    learning_rate=lr, epochs=10)
+        weights = perceptron.train(image_data, label_data)
 
-    perceptron.predict(test_data, test_labels)
+        perceptron.predict(test_data, test_labels)
 
     return
 

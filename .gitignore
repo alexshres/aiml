@@ -7,4 +7,7 @@
 ./perceptrons/__pycache*
 ./perceptrons/__pycache__
 __pycache__
+*.png
+*.tar.gz
+.gitignore
 
