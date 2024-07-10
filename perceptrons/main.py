@@ -45,7 +45,7 @@ def main():
     inputs = 785
     outputs = 10
 
-    perceptron = pct.Perceptron(inputs=inputs, outputs=outputs)
+    perceptron = pct.Perceptron(inputs=inputs, outputs=outputs, epochs=100)
     weights = perceptron.train(image_data, label_data)
 
     perceptron.predict(test_data, test_labels)

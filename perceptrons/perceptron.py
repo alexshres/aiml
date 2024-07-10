@@ -29,15 +29,14 @@ class Perceptron:
         # Shape of weights matrix is number of outputs times number of paramters in X
         self.weights = np.random.uniform(-0.05, 0.05, (self.outputs, self.inputs)) 
 
-        self.confusion_matrix = np.zeros((outputs+1, outputs+1))
+        self.confusion_matrix = np.zeros((outputs, outputs))
 
 
 
 
     def train(self, X, y):
-        training_data = X
         ones_column = np.ones((X.shape[0], 1))
-        training_data = np.hstack((ones_column, training_data))
+        training_data = np.hstack((ones_column, X))
 
         labels = y
         encoded_y = np.zeros((y.size, y.max() + 1)) 
@@ -58,17 +57,12 @@ class Perceptron:
                 output_vector = self.weights @ training_data[i].T 
                 prediction = np.argmax(output_vector)
 
-                # Updating how far off we were
-                t = 1
-                y = 1
 
-                if prediction != labels[i]:
-                    t = 0
-                if output_vector[prediction] <= 0:
-                    y = 0
-
-                for row in range(self.weights.shape[0]):
-                    self.weights[row] = self.weights[row] + self.learning_rate * \
+                for j in range(self.weights.shape[0]):
+                    # Updating how far off we were
+                    t = encoded_y[i, j]
+                    y = 1 if output_vector[j] > 0 else 0
+                    self.weights[j] = self.weights[j] + self.learning_rate * \
                             (t-y) * training_data[i]
 
         return self.weights
@@ -81,16 +75,31 @@ class Perceptron:
         test_labels = y
         total = test_data.shape[0]
         correct = 0
+        prediction_count = [0 for i in range(10)]
+        actual_count = [0 for i in range(10)]
+
+        for i in test_labels:
+            actual_count[i] += 1
 
         for i in range(test_data.shape[0]):
             output = self.weights @ test_data[i].T
             prediction = np.argmax(output)
+            prediction_count[prediction] += 1
+
 
             if prediction == test_labels[i]:
                 correct += 1
 
+        for pred in range(10):
+            for act in range(10):
+                self.confusion_matrix[pred, act] = (1.0 * prediction_count[pred])/ actual_count[act]
+
+
 
         print(f"Model predicted {correct} out of {total} for a {(1.0 * correct)/total} accuracy")
+
+
+        print(self.confusion_matrix)
 
 
 
@@ -102,7 +111,4 @@ class Perceptron:
         x = half_proj @ b
 
         return x
-
-
-
 
