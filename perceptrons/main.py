@@ -1,8 +1,8 @@
-import perceptron as pct
+import simple_pct as pct
 import mnist_data as md
 import numpy as np
 
-def main():
+def simple_pct_main():
 
     """
     A = np.array([[2, 3], [1, 1],
@@ -46,6 +46,24 @@ def main():
 
     return
 
+def pytorch_pct_main():
+    import pytorch_pct as ptpct
+
+    # Initialize and train the Perceptron
+    input_size = 28*28  # 784
+    num_classes = 10
+    learning_rate = 0.01
+    epochs = 10
+
+    model = ptpct.PyTorchPCT(input_size=input_size, num_classes=num_classes, 
+                       learning_rate=learning_rate, epochs=epochs)
+    model.train_model(ptpct.train_loader)
+
+    # Evaluate the model
+    model.evaluate_model(ptpct.test_loader)
+
+
+
 
 if __name__ == "__main__":
-    main()
+    pytorch_pct_main()
