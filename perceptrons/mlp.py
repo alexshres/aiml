@@ -42,3 +42,5 @@ class MLP:
 
 
     def train(self):
+        # Will be using the sigmoid activation function for now
+        pass
