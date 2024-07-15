@@ -34,6 +34,7 @@ class MLP:
         self.epochs = epochs
         self.eta = learning_rate
 
+        self.nodes = nodes
         self.layers = len(nodes) - 1
 
 
@@ -50,7 +51,11 @@ class MLP:
                 self.weights_array[layer] = np.hstack((ones_column, 
                                                        self.weights_array[layer]))
 
+        # Creating an activation ragged array where each index represents a layer and 
+        # contains node values post activation layer
+        self.__activations = [[0 for i in range(nodes[x])] for x in range(1, len(nodes))]
 
+        
     def __sigmoid(self, x):
         """ Implementation of sigmoid function"""
         return 1/(1+np.exp(-x))
@@ -61,12 +66,19 @@ class MLP:
         Forward propagation of finding h_j where h_j is the activated value
         of the j_th node
         """
-        return self.__sigmoid(np.dot(datum, weight))
+        return self.__sigmoid(np.dot(datum.T, weight))
 
 
     def train(self):
-        for row in self.train_data.shape[0]:
-
+        for row in range(self.train_data.shape[0]):
+            current_layer = 0
+            for i in range(self.nodes[1]):
+                self.__activations[current_layer][i] = self.__forward(
+                                                            self.train_data[row], 
+                                                            self.weights_array[current_layer][:, i]
+                                                            )
+                print(f"Activated value for layer {current_layer+1} and node {i+1} is"  \
+                      f" {self.__activations[current_layer][i]}")
             
         pass
 

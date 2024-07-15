@@ -12,8 +12,7 @@ def main():
 
     model = mlp.MLP(X, y, nodes=nodes)
 
-    for mat in range(len(model.weights_array)):
-        print(model.weights_array[mat].shape)
+    model.train()
 
 
     return
