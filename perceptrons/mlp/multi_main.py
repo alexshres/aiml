@@ -7,7 +7,7 @@ def main():
     X = np.array([[0, 0], [0, 1], [1, 0], [1,1]])
     y = np.array([[0], [1], [1], [0]])
 
-    nodes = [2, 2, 1]
+    nodes = [2, 2, 2]
 
 
     model = mlp.MLP(X, y, nodes=nodes)

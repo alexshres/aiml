@@ -25,18 +25,11 @@ class MLP:
         # Augmenting training data with biases of 1
         ones_column = np.ones((train_data.shape[0], 1)) 
         self.train_data = np.hstack((ones_column, train_data))
-
         self.train_labels = train_labels
-
-        
-        self.output_size = nodes[-1]
-
         self.epochs = epochs
         self.eta = learning_rate
-
         self.nodes = nodes
         self.layers = len(nodes) - 1
-
 
         # Each index in the array self.weights_array corresponds to weights
         # from one layer to its next layer
@@ -44,7 +37,6 @@ class MLP:
         for layer in range(self.layers):
             self.weights_array[layer] = np.random.uniform(-0.05, 0.05,
                                                            (nodes[layer]+1, nodes[layer+1]))
-
             # Adding bias to each weight matrix
             if layer != 0 and (layer != self.layers-1):
                 ones_column = np.ones((nodes[layer+1]+1, 1))
@@ -54,6 +46,10 @@ class MLP:
         # Creating an activation ragged array where each index represents a layer and 
         # contains node values post activation layer
         self.__activations = [[0 for i in range(nodes[x])] for x in range(1, len(nodes))]
+
+        # Adding ones to each activated value since that will become the bias term
+        for i in range(self.layers):
+            self.__activations[i].insert(-1, 1)
 
         
     def __sigmoid(self, x):
@@ -71,14 +67,18 @@ class MLP:
 
     def train(self):
         for row in range(self.train_data.shape[0]):
-            current_layer = 0
-            for i in range(self.nodes[1]):
-                self.__activations[current_layer][i] = self.__forward(
-                                                            self.train_data[row], 
-                                                            self.weights_array[current_layer][:, i]
-                                                            )
-                print(f"Activated value for layer {current_layer+1} and node {i+1} is"  \
-                      f" {self.__activations[current_layer][i]}")
+            data = self.train_data[row]
+            for lr in range(self.layers): 
+                for i in range(self.nodes[lr+1]):
+                    self.__activations[lr][i] =         \
+                             self.__forward(
+                                            data, 
+                                            self.weights_array[lr][:, i]
+                                           )
+                    print(f"Activated value for layer {lr+1} and node {i+1} is"  \
+                          f" {self.__activations[lr][i]}"                        \
+                          f" for training data row {row}")
+                data = np.asarray(self.__activations[lr])
             
         pass
 
