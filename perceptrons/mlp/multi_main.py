@@ -3,10 +3,11 @@ import numpy as np
 
 
 def main():
-    X = np.identity(3)
-    y = np.ones((3, 1))
+    # XOR example
+    X = np.array([[0, 0], [0, 1], [1, 0], [1,1]])
+    y = np.array([[0], [1], [1], [0]])
 
-    nodes = [785, 20, 10]
+    nodes = [2, 2, 1]
 
 
     model = mlp.MLP(X, y, nodes=nodes)

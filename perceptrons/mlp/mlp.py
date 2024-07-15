@@ -5,7 +5,6 @@ import numpy as np
 
 class MLP:
     def __init__(self, train_data, train_labels,
-#                 output_size,
                  nodes=[1, 1],
                  epochs=10,
                  learning_rate=0.1,
@@ -66,4 +65,11 @@ class MLP:
 
 
     def train(self):
+        for row in self.train_data.shape[0]:
+
+            
         pass
+
+
+
+
