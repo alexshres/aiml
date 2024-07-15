@@ -23,7 +23,6 @@ class MLP:
             nodes[n] = # of nodes in output
         """
 
-        """
         # Augmenting training data with biases of 1
         ones_column = np.ones((train_data.shape[0], 1)) 
         self.train_data = np.hstack((ones_column, train_data))
@@ -35,18 +34,14 @@ class MLP:
 
         self.epochs = epochs
         self.eta = learning_rate
-        """
 
         self.layers = len(nodes) - 1
 
-        for ele in nodes:
-            print(f"value={ele}")
 
         # Each index in the array self.weights_array corresponds to weights
         # from one layer to its next layer
         self.weights_array = [np.random.uniform(0, 1, (2, 2)) for i in range(self.layers)]
         for layer in range(self.layers):
-            print(f"Creating weight matrix of size {nodes[layer]+1, nodes[layer+1]}")
             self.weights_array[layer] = np.random.uniform(-0.05, 0.05,
                                                            (nodes[layer]+1, nodes[layer+1]))
 
@@ -57,9 +52,18 @@ class MLP:
                                                        self.weights_array[layer]))
 
 
+    def __sigmoid(self, x):
+        """ Implementation of sigmoid function"""
+        return 1/(1+np.exp(-x))
 
+
+    def __forward(self, datum, weight):
+        """ 
+        Forward propagation of finding h_j where h_j is the activated value
+        of the j_th node
+        """
+        return self.__sigmoid(np.dot(datum, weight))
 
 
     def train(self):
-        # Will be using the sigmoid activation function for now
         pass
