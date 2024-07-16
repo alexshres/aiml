@@ -8,6 +8,7 @@ class MLP:
                  nodes=[1, 1],
                  epochs=10,
                  learning_rate=0.1,
+                 momentum=0.9
                  ):
         """
         Input size will be included in the nodes array where the first index
@@ -30,6 +31,7 @@ class MLP:
         self.eta = learning_rate
         self.nodes = nodes
         self.layers = len(nodes) - 1
+        self.momentum = momentum
 
         # Each index in the array self.weights_array corresponds to weights
         # from one layer to its next layer
@@ -45,10 +47,11 @@ class MLP:
 
         # Creating an activation ragged array where each index represents a layer and 
         # contains node values post activation layer
-        self.__activations = [[0 for i in range(nodes[x])] for x in range(1, len(nodes))]
+        self.__activations = [[0 for i in range(self.nodes[x])] for x in range(1, len(self.nodes))]
+        self.__errors = [[0 for i in range(nodes[x])] for x in range(self.layers)]
 
         # Adding ones to each activated value since that will become the bias term
-        for i in range(self.layers):
+        for i in range(self.layers-1):
             self.__activations[i].insert(-1, 1)
 
         
@@ -64,10 +67,20 @@ class MLP:
         """
         return self.__sigmoid(np.dot(datum.T, weight))
 
+    def __weight_update(self):
+        """
+        Backpropagation portion of the algorithm
+        """
+        pass
+
 
     def train(self):
         for row in range(self.train_data.shape[0]):
+            target = self.train_labels[row]
+            encoding = [0.9 if x == target else 0.1 for x in range(self.nodes[-1])]
             data = self.train_data[row]
+
+            # Work through each layer activating the nodes
             for lr in range(self.layers): 
                 for i in range(self.nodes[lr+1]):
                     self.__activations[lr][i] =         \
@@ -75,11 +88,20 @@ class MLP:
                                             data, 
                                             self.weights_array[lr][:, i]
                                            )
-                    print(f"Activated value for layer {lr+1} and node {i+1} is"  \
-                          f" {self.__activations[lr][i]}"                        \
-                          f" for training data row {row}")
                 data = np.asarray(self.__activations[lr])
-            
+            # At this point all output nodes have some value
+            # Now we update weights based on error starting with the last layer before
+            # the output layer
+
+            print(f"Target encoding {encoding}")
+            print(f"Output nodes    {self.__activations[-1]}")
+
+            for i in range(self.nodes[-1]):
+                self.__errors[-1][i] = self.__activations[-1][i] * (1-self.__activations[-1][i]) * \
+                                (encoding[i] - self.__activations[-1][i])
+
+            print(f"Error array {self.__errors}")
+
         pass
 
 
