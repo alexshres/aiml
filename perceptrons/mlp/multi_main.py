@@ -10,6 +10,7 @@ def main():
     nodes = [2, 2, 2]
 
 
+    print(f"Dataset is {X}")
     model = mlp.MLP(X, y, nodes=nodes)
 
     model.train()

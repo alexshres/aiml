@@ -34,26 +34,34 @@ class MLP:
         self.layers = len(nodes) - 1
         self.momentum = momentum
 
-        # Each index in the array self.weights_array corresponds to weights
+        # Each index in the array self.weights corresponds to weights
         # from one layer to its next layer
-        self.weights_array = [np.random.uniform(0, 1, (2, 2)) for i in range(self.layers)]
+        self.weights = [np.random.uniform(0, 1, (2, 2)) for i in range(self.layers)]
         for layer in range(self.layers):
-            self.weights_array[layer] = np.random.uniform(-0.05, 0.05,
+            self.weights[layer] = np.random.uniform(-0.05, 0.05,
                                                            (nodes[layer]+1, nodes[layer+1]))
-            # Adding bias to each weight matrix
-            if layer != 0 and (layer != self.layers-1):
-                ones_column = np.ones((nodes[layer+1]+1, 1))
-                self.weights_array[layer] = np.hstack((ones_column, 
-                                                       self.weights_array[layer]))
 
         # Creating an activation ragged array where each index represents a layer and 
         # contains node values post activation layer
+        """
         self.__activations = [[0 for i in range(self.nodes[x])] for x in range(1, len(self.nodes))]
         self.__errors = [[0 for i in range(nodes[x])] for x in range(self.layers)]
+        """
 
+        # Will be updated by the forward method
+        self.__activations = []
+
+        # Will be updated by the backward method
+        self.__errors = []
+
+
+        print(f"Printing initializedw weights:\n{self.weights}")
+
+        """
         # Adding ones to each activated value since that will become the bias term
         for i in range(self.layers-1):
             self.__activations[i].insert(-1, 1)
+        """
 
         
     def __sigmoid(self, x):
@@ -61,33 +69,58 @@ class MLP:
         return 1/(1+np.exp(-x))
 
 
-    def __forward(self, datum, weight):
+    def __forward(self, datum):
         """ 
         Forward propagation of finding h_j where h_j is the activated value
         of the j_th node
         """
-        return self.__sigmoid(np.dot(datum.T, weight))
 
-    def __weight_update(self):
+        data = [datum]
+        
+        for i in range(len(self.weights)):
+            activations = []
+
+            # Only the last layer does not have a bias node
+            # This for loop calculates activations starting at the first hidden layer
+            if i != len(self.weights) - 1:
+                activations = [1]
+            for w in range(self.weights[i].shape[1]):
+                activations.append(self.__sigmoid(np.dot(data[-1].T, self.weights[i][:, w])))
+
+            data.append(np.asarray(activations))
+            self.__activations.append(data[-1])
+
+        return 
+
+    def __backprop(self, target):
         """
         Backpropagation portion of the algorithm
         """
+        encoding = [0.9 if x == target else 0.1 for x in range(self.nodes[-1])]
+        
+
+
+
+
         pass
 
 
     def train(self):
         for row in range(self.train_data.shape[0]):
             target = self.train_labels[row]
-            encoding = [0.9 if x == target else 0.1 for x in range(self.nodes[-1])]
             data = self.train_data[row]
 
+            self.__forward(data)
+            print(f"Printing activations:\n{self.__activations}")
+
+            """
             # Work through each layer activating the nodes
             for lr in range(self.layers): 
                 for i in range(self.nodes[lr+1]):
                     self.__activations[lr][i] =         \
                              self.__forward(
                                             data, 
-                                            self.weights_array[lr][:, i]
+                                            self.weights[lr][:, i]
                                            )
                 data = np.asarray(self.__activations[lr])
             # At this point all output nodes have some value
@@ -105,30 +138,27 @@ class MLP:
 
             print(f"errors = {self.__errors[1]}")
             print(f"activations = {self.__activations[1]}")
-            print(f"weights for output layer = {self.weights_array[1]}")
+            print(f"weights for output layer = {self.weights[1]}")
             for k in range(self.nodes[1]):
                 print(f"K ====== {k}")
-                for j in range(self.weights_array[1].shape[1]):
-                    self.weights_array[1][k, j] = self.weights_array[1][k, j] + \
+                for j in range(self.weights[1].shape[1]):
+                    self.weights[1][k, j] = self.weights[1][k, j] + \
                                                  (self.eta * self.__errors[1][j] * \
                                                   self.__activations[1][k]
                                                   )
-            print(f"weights for output layer = {self.weights_array[1]}")
+            print(f"weights for output layer = {self.weights[1]}")
                     
 
-            """
             # Calculating errors for hidden node layer
             for j in range(self.nodes[0]): 
                 # Compute sum of the k outputs: w_kj * delta_k
                 for k in range(self.outputs):
                     # 1 because we want weights from hidden layer to output 
                     # and in 2 layer node, that is in index=1 in the weights array
-                    self.weights_array[1][j, k]
-            """
-
-
+                    self.weights[1][j, k]
 
             print(f"Error array {self.__errors}")
+            """
 
         pass
 
