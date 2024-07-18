@@ -27,6 +27,7 @@ class MLP:
         ones_column = np.ones((train_data.shape[0], 1)) 
         self.train_data = np.hstack((ones_column, train_data))
         self.train_labels = train_labels
+        self.outputs = nodes[-1]
         self.epochs = epochs
         self.eta = learning_rate
         self.nodes = nodes
@@ -96,9 +97,36 @@ class MLP:
             print(f"Target encoding {encoding}")
             print(f"Output nodes    {self.__activations[-1]}")
 
+            # The 2 for loops below will be all incorporated into the self.__weight_update 
+            # function but for now doing it here
             for i in range(self.nodes[-1]):
                 self.__errors[-1][i] = self.__activations[-1][i] * (1-self.__activations[-1][i]) * \
                                 (encoding[i] - self.__activations[-1][i])
+
+            print(f"errors = {self.__errors[1]}")
+            print(f"activations = {self.__activations[1]}")
+            print(f"weights for output layer = {self.weights_array[1]}")
+            for k in range(self.nodes[1]):
+                print(f"K ====== {k}")
+                for j in range(self.weights_array[1].shape[1]):
+                    self.weights_array[1][k, j] = self.weights_array[1][k, j] + \
+                                                 (self.eta * self.__errors[1][j] * \
+                                                  self.__activations[1][k]
+                                                  )
+            print(f"weights for output layer = {self.weights_array[1]}")
+                    
+
+            """
+            # Calculating errors for hidden node layer
+            for j in range(self.nodes[0]): 
+                # Compute sum of the k outputs: w_kj * delta_k
+                for k in range(self.outputs):
+                    # 1 because we want weights from hidden layer to output 
+                    # and in 2 layer node, that is in index=1 in the weights array
+                    self.weights_array[1][j, k]
+            """
+
+
 
             print(f"Error array {self.__errors}")
 
