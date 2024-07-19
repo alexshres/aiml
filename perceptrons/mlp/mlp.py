@@ -5,7 +5,7 @@ import numpy as np
 
 class MLP:
     def __init__(self, train_data, train_labels,
-                 nodes=[1, 1],
+                 nodes,
                  epochs=10,
                  learning_rate=0.1,
                  momentum=0.9
@@ -27,7 +27,6 @@ class MLP:
         ones_column = np.ones((train_data.shape[0], 1)) 
         self.train_data = np.hstack((ones_column, train_data))
         self.train_labels = train_labels
-        self.outputs = nodes[-1]
         self.epochs = epochs
         self.eta = learning_rate
         self.nodes = nodes
@@ -41,27 +40,13 @@ class MLP:
             self.weights[layer] = np.random.uniform(-0.05, 0.05,
                                                            (nodes[layer]+1, nodes[layer+1]))
 
-        # Creating an activation ragged array where each index represents a layer and 
-        # contains node values post activation layer
-        """
-        self.__activations = [[0 for i in range(self.nodes[x])] for x in range(1, len(self.nodes))]
-        self.__errors = [[0 for i in range(nodes[x])] for x in range(self.layers)]
-        """
-
         # Will be updated by the forward method
         self.__activations = []
 
         # Will be updated by the backward method
         self.__errors = []
 
-
-        print(f"Printing initializedw weights:\n{self.weights}")
-
-        """
-        # Adding ones to each activated value since that will become the bias term
-        for i in range(self.layers-1):
-            self.__activations[i].insert(-1, 1)
-        """
+        print(f"Printing initialized weights:\n{self.weights}")
 
         
     def __sigmoid(self, x):
@@ -88,21 +73,78 @@ class MLP:
                 activations.append(self.__sigmoid(np.dot(data[-1].T, self.weights[i][:, w])))
 
             data.append(np.asarray(activations))
-            self.__activations.append(data[-1])
+
+        self.__activations = data[1:]
 
         return 
 
-    def __backprop(self, target):
+    def __backprop(self, target, data):
         """
         Backpropagation portion of the algorithm
         """
+
+        error = []
         encoding = [0.9 if x == target else 0.1 for x in range(self.nodes[-1])]
-        
+        print(f"Encoding is {encoding}")
 
 
+        # grabbing just the acivations we need to compute errors for current 
+        # input row
+        self.__activations
+
+        # Reversing for backpropagation to work
+        rev_activations = self.__activations[::-1]
+
+        # getting output error
+        for t in range(len(encoding)):
+            output = rev_activations[0][t]
+            target = encoding[t]
+            error.append(output * (1-output) * (target-output))
+
+        self.__errors.append(np.asarray(error))
+
+        # Calculating layer error at each hidden node and then 
+        # adding it to self.__errors so we can access later for updates
+        # and previous layer error calculations
+        for i in range(1, len(rev_activations)):
+            layer_error = []
+            activations = rev_activations[i]
+            # Removing the 1 that corresponds to the bias
+            activations = activations[-len(activations)+1:]
+            previous_layer_error = self.__errors[-1]
+
+            for j in range(len(activations)):
+                wt_idx = len(self.weights)-i
+                error = activations[j] * (1 - activations[j]) * np.dot(previous_layer_error, 
+                                                                       self.weights[wt_idx][j+1, :])
+                layer_error.append(error)
+            self.__errors.append(np.asarray(layer_error))
+
+        print(f"Printing self.__errors = {self.__errors}")
+        # Now that we have all the errors we can updating weights from input layer all the
+        # way to the last layer, that's why we have to reverse the errors
+        rev_errors = self.__errors[::-1]
 
 
-        pass
+        print(f"self.__activations = {self.__activations}")
+
+
+        # Updating weights now
+        for i in range(len(self.weights)):
+            for j in range(self.weights[i].shape[0]):
+                for k in range(self.weights[i].shape[1]):
+                    err = rev_errors[i][k]
+
+                    print(f"self.__activations[i] = {self.__activations[i]}")
+                    print(f"shape is {self.__activations[i].shape}")
+                    print(f"j = {j}")
+                    active = self.__activations[i][j]
+
+                    self.weights[i][j, k] = self.eta * err * active
+
+
+        print(f"Printing updated weights {self.weights}")
+         
 
 
     def train(self):
@@ -110,58 +152,19 @@ class MLP:
             target = self.train_labels[row]
             data = self.train_data[row]
 
+            print("Beginning forward propagation.")
             self.__forward(data)
             print(f"Printing activations:\n{self.__activations}")
 
-            """
-            # Work through each layer activating the nodes
-            for lr in range(self.layers): 
-                for i in range(self.nodes[lr+1]):
-                    self.__activations[lr][i] =         \
-                             self.__forward(
-                                            data, 
-                                            self.weights[lr][:, i]
-                                           )
-                data = np.asarray(self.__activations[lr])
-            # At this point all output nodes have some value
-            # Now we update weights based on error starting with the last layer before
-            # the output layer
 
-            print(f"Target encoding {encoding}")
-            print(f"Output nodes    {self.__activations[-1]}")
+            print("Beginning back propagation.")
+            self.__backprop(target, data)
 
-            # The 2 for loops below will be all incorporated into the self.__weight_update 
-            # function but for now doing it here
-            for i in range(self.nodes[-1]):
-                self.__errors[-1][i] = self.__activations[-1][i] * (1-self.__activations[-1][i]) * \
-                                (encoding[i] - self.__activations[-1][i])
-
-            print(f"errors = {self.__errors[1]}")
-            print(f"activations = {self.__activations[1]}")
-            print(f"weights for output layer = {self.weights[1]}")
-            for k in range(self.nodes[1]):
-                print(f"K ====== {k}")
-                for j in range(self.weights[1].shape[1]):
-                    self.weights[1][k, j] = self.weights[1][k, j] + \
-                                                 (self.eta * self.__errors[1][j] * \
-                                                  self.__activations[1][k]
-                                                  )
-            print(f"weights for output layer = {self.weights[1]}")
-                    
-
-            # Calculating errors for hidden node layer
-            for j in range(self.nodes[0]): 
-                # Compute sum of the k outputs: w_kj * delta_k
-                for k in range(self.outputs):
-                    # 1 because we want weights from hidden layer to output 
-                    # and in 2 layer node, that is in index=1 in the weights array
-                    self.weights[1][j, k]
-
-            print(f"Error array {self.__errors}")
-            """
+            if row > 0:
+                break
 
         pass
+        
 
-
-
+        
 
