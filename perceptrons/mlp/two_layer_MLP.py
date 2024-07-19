@@ -45,9 +45,11 @@ class TwoMLP:
         self.hidden_error = None
         self.output_error = None
 
+        # Where we will store accuracies
         self.training_accuracy = [0 for i in range(self.epochs)]
         self.test_accuracy = [0 for i in range(self.epochs)]
 
+        # Zero initialized confusion matrix where dimensions = output x output
         self.confusion_matrix = np.zeros((outputs, outputs))
 
         self.type = type 
@@ -61,6 +63,8 @@ class TwoMLP:
         return x * (1-x)
     
     def __forward(self, data):
+
+        # Calculating hidden layer activations then pass that into output activations
         self.hidden_activation = self.__sigmoid(np.dot(data, self.W) + self.b_W)
         self.output_activation = self.__sigmoid(np.dot(self.hidden_activation, 
                                                        self.V) + self.b_V)
@@ -69,23 +73,28 @@ class TwoMLP:
 
 
     def __backward(self, data, label):
+        # Computing error and delta for the output nodes
         self.output_error = label - self.output_activation
         self.output_delta = self.output_error * self.__sigmoid_prime(self.output_activation)
 
+        # Computing error and delta for the hidden layer nodes
         self.hidden_error = np.dot(self.output_delta, self.V.T)
         self.hidden_delta = self.hidden_error * self.__sigmoid_prime(self.hidden_activation)
 
+        # The update values for each weight matrix
         d_W = np.dot(data.T, self.hidden_delta)
         d_V = np.dot(self.hidden_activation.T, self.output_delta)
         d_b_W = np.sum(self.hidden_delta, axis=0, keepdims=True)
         d_b_V = np.sum(self.output_delta, axis=0, keepdims=True)
 
 
+        # Updating weights
         self.W += self.lr * d_W + self.m * self.W_prev
         self.V += self.lr * d_V + self.m * self.V_prev
         self.b_W += self.lr * d_b_W + self.m * self.b_W_prev
         self.b_V += self.lr * d_b_V + self.m * self.b_V_prev
 
+        # Updating previous weights for momentum update to weights
         self.W_prev = d_W
         self.V_prev = d_V
         self.b_W_prev = d_b_W
@@ -97,6 +106,8 @@ class TwoMLP:
             correct = 0
             for i in range(self.train_data.shape[0]):
                 data = self.train_data[i].reshape(1, -1)
+
+                # encoding labels so 0.9 for correct classification and 0.1 for rest
                 label = np.full((10,), 0.1)
                 label[self.train_labels[i]] = 0.9
 
@@ -108,12 +119,17 @@ class TwoMLP:
 
                 self.__backward(data, label)
 
+            # Calculating accuracy
             self.training_accuracy[epoch] = correct / self.train_data.shape[0] 
             self.test_accuracy[epoch] = self.__fit(test_data, test_labels)/test_data.shape[0]
 
+        # Plot of accuracies on one chart
         self.accuracy_plot(self.training_accuracy, self.test_accuracy) 
 
     def __fit(self, test_data, test_labels):
+        """
+        This function is used to calculate accuracies during training for the test data set
+        """
         correct = 0
 
         for i in range(test_data.shape[0]):
@@ -127,6 +143,11 @@ class TwoMLP:
         return correct
 
     def fit(self, test_data, test_labels):
+        """
+        This function is used to actually test against the test data set once training
+        is complete
+
+        """
         correct = 0
 
         total = test_data.shape[0]
