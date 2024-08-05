@@ -1,17 +1,21 @@
 import pandas as pd
-import spam_data as sd
 import nbc
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score
+from ucimlrepo import fetch_ucirepo
 
 def main():
+    spambase = fetch_ucirepo(id=94)
+    features = spambase.data.features
+    target = spambase.data.targets
+
     # Naive Bayes classifier will take in a pandas dataframe object
     X_train, X_test, y_train, y_test = train_test_split(
-                                            sd.features, 
-                                            sd.target, 
+                                            features, 
+                                            target, 
                                             test_size=0.5, 
-                                            stratify=sd.target      # Ensures 60/40 split
+                                            stratify=target      # Ensures 60/40 split
                                         )
 
     classifier = nbc.NaiveBayesBinary(training_data=X_train, 
