@@ -10,10 +10,16 @@ class KMeans:
         mins = self.X.min(axis=0).tolist()
         max = self.X.max(axis=0).tolist()
 
-        self.centers = []
+        self.centers = [] 
 
-        for col in self.X.shape[1]:
-            pass
+        # Randomly initializing centers based on min/max of the data
+        for c in range(self.k):
+            low = mins[c]
+            high = max[c]
+            self.centers.append(np.random.uniform(low, high, self.X.shape[1]))
+
+        print(self.centers)
+
 
 
     def train(self):
