@@ -16,9 +16,9 @@ class KMeans:
 
         # Randomly initializing centers based on min/max of the data
         for c in range(self.k):
-            low = mins[c]
-            high = max[c]
-            self.centers.append(np.random.uniform(low, high, self.X.shape[1]))
+            low = np.min(mins)
+            high = np.max(max)
+            self.__centers.append(np.random.uniform(low, high, self.X.shape[1]))
 
         # Defines which cluster each data is assigned to
         # The value is mapped to the index of the self.__centers 
@@ -28,7 +28,6 @@ class KMeans:
         self.__center_size = [0] * len(self.__centers)
 
 
-
     def __closest_cluster(self, data):
         """
         Returns index of cluster that has the 
@@ -36,10 +35,10 @@ class KMeans:
         """
 
         min_arg = 0
-        min_dist = np.linalg.norm(data, self.__centers[0])
+        min_dist = np.linalg.norm(data - self.__centers[0])
 
         for i in range(len(self.__centers)):
-            curr_dist = np.linalg.norm(data, self.__centers[i])
+            curr_dist = np.linalg.norm(data - self.__centers[i])
             # Update min_arg and min_dist only if curr_dist is smaller
             if curr_dist < min_dist:
                 min_dist = curr_dist
@@ -56,13 +55,14 @@ class KMeans:
         for c in range(len(self.__centers)):
             temp = np.zeros(self.X.shape[1])
 
-            for i in range(len(self.__clusters)):
-                if self.__clusters[i] == c:
+            for i in range(len(self.__cluster)):
+                if self.__cluster[i] == c:
                     # Adding up all vectors that are assigned to the vector
                     temp += self.X[i]
              
             # Updating each cluster center
-            self.__centers[c] = temp / self.__center_size[c]
+            if self.__center_size[c] != 0:
+                self.__centers[c] = temp / self.__center_size[c]
 
 
 
@@ -76,7 +76,25 @@ class KMeans:
                 self.__center_size[cluster_idx] += 1
             self.__update_centers()
 
-    def rss(self):
+        # Need to reassign clusters since we have the final center update
+        for row in range(self.X.shape[0]):
+            # Assign cluster for each data point
+            cluster_idx = self.__closest_cluster(self.X[row])
+            self.__cluster[row] = cluster_idx
+            # Updating number of elements assigned to cluster
+            self.__center_size[cluster_idx] += 1
+
+        # Calling sum squared errors
+        self.sse()
+        
+
+    def sse(self):
+        sse = 0
+        for row in range(self.X.shape[0]):
+            sse += np.linalg.norm(self.__cluster[row] - row)
+
+        print(f"{sse=}")
+        
 
 
 
