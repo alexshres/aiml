@@ -7,7 +7,7 @@ def main():
 
 
 
-    for c in range(2, 10):
+    for c in range(2, 6):
         model = km.KMeans(data, centers=c)
         print(f"{c=}")
         model.train()
